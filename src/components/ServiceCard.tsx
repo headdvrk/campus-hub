@@ -1,67 +1,71 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Service } from '../types/service';
 import { useSettings } from '../context/SettingsContext';
 import { radius, spacing } from '../styles/theme';
 import { AppText } from './AppText';
+import { GradientIcon } from './GradientIcon';
+import { PressableScale } from './PressableScale';
 
 type Props = {
   service: Service;
   onPress: (service: Service) => void;
 };
 
+// Сервис плиткасы: градиентті белгіше, атауы және қысқа сипаттамасы
 export function ServiceCard({ service, onPress }: Props) {
   const { colors, language } = useSettings();
 
   return (
-    <Pressable
+    <PressableScale
       onPress={() => onPress(service)}
-      accessibilityRole="button"
-      style={({ pressed }) => [
+      accessibilityLabel={service.title[language]}
+      containerStyle={styles.container}
+      style={[
         styles.card,
-        { backgroundColor: colors.card, borderColor: colors.border },
-        pressed && styles.pressed,
+        { backgroundColor: colors.card, shadowColor: colors.shadow },
       ]}
     >
-      <View style={[styles.iconBox, { backgroundColor: colors.iconBackground }]}>
-        <Ionicons name={service.icon} size={24} color={colors.primary} />
+      <View style={styles.top}>
+        <GradientIcon icon={service.icon} colors={service.gradient} size={44} />
+        <Ionicons name="arrow-forward-circle" size={22} color={colors.separator} />
       </View>
       <View style={styles.texts}>
-        <AppText size="lg" bold>
+        <AppText variant="headline" numberOfLines={1}>
           {service.title[language]}
         </AppText>
-        <AppText size="sm" color="muted">
+        <AppText variant="footnote" color="muted" numberOfLines={2}>
           {service.description[language]}
         </AppText>
       </View>
-      <Ionicons name="chevron-forward" size={20} color={colors.muted} />
-    </Pressable>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+    flex: 1,
+    minHeight: 150,
     borderRadius: radius.lg,
-    borderWidth: 1,
     padding: spacing.md,
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
   },
-  pressed: {
-    opacity: 0.7,
-  },
-  iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+  top: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
   },
   texts: {
-    flex: 1,
     gap: 2,
   },
 });

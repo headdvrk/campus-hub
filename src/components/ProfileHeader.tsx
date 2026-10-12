@@ -1,27 +1,47 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Student } from '../types/student';
 import { useSettings } from '../context/SettingsContext';
-import { spacing } from '../styles/theme';
+import { radius, spacing } from '../styles/theme';
 import { AppText } from './AppText';
 
 type Props = { student: Student };
 
+// Градиентті сақинасы бар аватар, аты-жөні және тобы
 export function ProfileHeader({ student }: Props) {
   const { colors } = useSettings();
 
   return (
     <View style={styles.container}>
-      <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
-        <AppText size="xxl" bold color="onPrimary">
-          {student.initials}
-        </AppText>
-      </View>
-      <AppText size="xl" bold>
+      <LinearGradient
+        colors={colors.hero}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.ring}
+      >
+        <View style={[styles.avatarInner, { backgroundColor: colors.background }]}>
+          <LinearGradient
+            colors={colors.hero}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.avatar}
+          >
+            <AppText variant="title1" color="onPrimary">
+              {student.initials}
+            </AppText>
+          </LinearGradient>
+        </View>
+      </LinearGradient>
+      <AppText variant="title2" center>
         {student.name}
       </AppText>
-      <AppText color="muted">{student.group}</AppText>
+      <View style={[styles.chip, { backgroundColor: colors.iconBackground }]}>
+        <AppText variant="footnote" color="primary" style={styles.chipText}>
+          {student.group}
+        </AppText>
+      </View>
     </View>
   );
 }
@@ -29,14 +49,33 @@ export function ProfileHeader({ student }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: spacing.xs,
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  ring: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    padding: 3,
+    marginBottom: spacing.xs,
+  },
+  avatarInner: {
+    flex: 1,
+    borderRadius: 54,
+    padding: 3,
   },
   avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    flex: 1,
+    borderRadius: 51,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+  },
+  chip: {
+    borderRadius: radius.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  chipText: {
+    fontWeight: '600',
   },
 });

@@ -3,37 +3,44 @@ import { StyleProp, Text, TextStyle } from 'react-native';
 
 import { useSettings } from '../context/SettingsContext';
 import { AppTheme } from '../theme/themes';
-import { fontSize } from '../styles/theme';
+import { TextVariant, typography } from '../styles/theme';
+
+type ColorKey = {
+  [K in keyof AppTheme]: AppTheme[K] extends string ? K : never;
+}[keyof AppTheme];
 
 type Props = {
   children: ReactNode;
-  size?: keyof typeof fontSize;
-  color?: keyof AppTheme;
-  bold?: boolean;
+  variant?: TextVariant;
+  color?: ColorKey;
   center?: boolean;
+  numberOfLines?: number;
   style?: StyleProp<TextStyle>;
 };
 
 // Түсі тақырыптан, өлшемі таңдалған қаріп масштабынан алынатын мәтін
 export function AppText({
   children,
-  size = 'md',
+  variant = 'body',
   color = 'text',
-  bold = false,
   center = false,
+  numberOfLines,
   style,
 }: Props) {
   const { colors, scale } = useSettings();
-  const scaled = scale(fontSize[size]);
+  const { size, weight } = typography[variant];
+  const fontSize = scale(size);
 
   return (
     <Text
+      numberOfLines={numberOfLines}
       style={[
         {
           color: colors[color],
-          fontSize: scaled,
-          lineHeight: Math.round(scaled * 1.35),
-          fontWeight: bold ? '700' : '400',
+          fontSize,
+          lineHeight: Math.round(fontSize * 1.3),
+          fontWeight: weight,
+          letterSpacing: size >= 28 ? 0.35 : size >= 20 ? 0.2 : -0.2,
           textAlign: center ? 'center' : undefined,
         },
         style,

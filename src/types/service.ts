@@ -15,4 +15,7 @@ export type Service = {
   description: LocalizedText;
   icon: IconName;
   details: LocalizedText;
+  gradient: readonly [string, string];
+  hours: string;
+  location: LocalizedText;
 };

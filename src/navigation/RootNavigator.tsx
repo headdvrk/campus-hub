@@ -14,7 +14,10 @@ export function RootNavigator() {
   const { t } = useSettings();
 
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{ animation: 'slide_from_right' }}
+    >
       <Stack.Screen
         name="Login"
         component={LoginScreen}
@@ -23,20 +26,21 @@ export function RootNavigator() {
       <Stack.Screen
         name="Main"
         component={MainTabs}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, animation: 'fade' }}
       />
       <Stack.Screen
         name="Details"
         component={DetailsScreen}
+        // Details өз градиент тақырыбын және "артқа" батырмасын салады
         options={({ route }) => ({
+          headerShown: false,
           title: route.params?.title ?? t('detailsDefaultTitle'),
-          headerBackTitle: t('back'),
         })}
       />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
-        options={{ title: t('notFoundHeader') }}
+        options={{ title: t('notFoundHeader'), headerShadowVisible: false }}
       />
     </Stack.Navigator>
   );

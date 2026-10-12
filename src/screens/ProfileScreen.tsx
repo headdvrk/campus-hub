@@ -1,5 +1,4 @@
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import {
@@ -13,12 +12,12 @@ import { useSettings } from '../context/SettingsContext';
 import { languageNames } from '../i18n/translations';
 import {
   AppText,
-  Card,
-  InfoRow,
-  PrimaryButton,
+  FadeIn,
+  ListGroup,
+  ListRow,
   ProfileHeader,
+  Screen,
 } from '../components';
-import { spacing } from '../styles/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Profile'>,
@@ -32,7 +31,8 @@ const fontScaleKey = {
 } as const;
 
 export function ProfileScreen({ navigation }: Props) {
-  const { colors, theme, fontScale, language, t } = useSettings();
+  const { theme, fontScale, language, t } = useSettings();
+  const openSettings = () => navigation.navigate('Settings');
 
   // Шығу: тарихты тазалап, Login экранына қайтару
   const handleLogout = () => {
@@ -42,55 +42,76 @@ export function ProfileScreen({ navigation }: Props) {
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.content}
-    >
-      <ProfileHeader student={student} />
+    <Screen title={t('tabProfile')}>
+      <FadeIn>
+        <ProfileHeader student={student} />
+      </FadeIn>
 
-      <Card style={styles.infoCard}>
-        <InfoRow icon="school-outline" label={t('program')} value={student.program[language]} />
-        <InfoRow icon="people-outline" label={t('group')} value={student.group} />
-        <InfoRow
-          icon="ribbon-outline"
-          label={t('course')}
-          value={t('courseValue', { n: student.course })}
-        />
-      </Card>
-
-      <Card>
-        <AppText size="lg" bold>
-          {t('currentSettings')}
+      <FadeIn delay={80}>
+        <AppText variant="footnote" color="muted" style={{ marginLeft: 16 }}>
+          {t('studentInfo').toUpperCase()}
         </AppText>
-        <InfoRow
-          icon={theme === 'dark' ? 'moon-outline' : 'sunny-outline'}
-          label={t('theme')}
-          value={theme === 'dark' ? t('themeDark') : t('themeLight')}
-        />
-        <InfoRow
-          icon="text-outline"
-          label={t('fontSize')}
-          value={t(fontScaleKey[fontScale])}
-        />
-        <InfoRow
-          icon="language-outline"
-          label={t('language')}
-          value={languageNames[language]}
-        />
-      </Card>
+      </FadeIn>
+      <FadeIn delay={110}>
+        <ListGroup>
+          <ListRow
+            icon="school"
+            iconColors={['#0A84FF', '#0060DF']}
+            title={t('program')}
+            value={student.program[language]}
+            stacked
+          />
+          <ListRow
+            icon="people"
+            iconColors={['#5E5CE6', '#3634A3']}
+            title={t('group')}
+            value={student.group}
+          />
+          <ListRow
+            icon="ribbon"
+            iconColors={['#FF9F0A', '#FF6B00']}
+            title={t('course')}
+            value={t('courseValue', { n: student.course })}
+          />
+        </ListGroup>
+      </FadeIn>
 
-      <PrimaryButton title={t('logout')} variant="danger" onPress={handleLogout} />
-    </ScrollView>
+      <FadeIn delay={170}>
+        <AppText variant="footnote" color="muted" style={{ marginLeft: 16 }}>
+          {t('currentSettings').toUpperCase()}
+        </AppText>
+      </FadeIn>
+      <FadeIn delay={200}>
+        <ListGroup>
+          <ListRow
+            icon={theme === 'dark' ? 'moon' : 'sunny'}
+            iconColors={theme === 'dark' ? ['#5E5CE6', '#1C1C3C'] : ['#FFD60A', '#FF9F0A']}
+            title={t('theme')}
+            value={theme === 'dark' ? t('themeDark') : t('themeLight')}
+            onPress={openSettings}
+          />
+          <ListRow
+            icon="text"
+            iconColors={['#0A84FF', '#0060DF']}
+            title={t('fontSize')}
+            value={t(fontScaleKey[fontScale])}
+            onPress={openSettings}
+          />
+          <ListRow
+            icon="language"
+            iconColors={['#30D158', '#00A86B']}
+            title={t('language')}
+            value={languageNames[language]}
+            onPress={openSettings}
+          />
+        </ListGroup>
+      </FadeIn>
+
+      <FadeIn delay={260}>
+        <ListGroup>
+          <ListRow title={t('logout')} destructive chevron={false} onPress={handleLogout} />
+        </ListGroup>
+      </FadeIn>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  content: {
-    padding: spacing.md,
-    gap: spacing.md,
-  },
-  infoCard: {
-    paddingVertical: spacing.sm,
-    gap: 0,
-  },
-});

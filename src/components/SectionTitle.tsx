@@ -1,21 +1,33 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { spacing } from '../styles/theme';
 import { AppText } from './AppText';
 
-type Props = { title: string; subtitle?: string };
+type Props = {
+  title: string;
+  subtitle?: string;
+  actionLabel?: string;
+  onAction?: () => void;
+};
 
-export function SectionTitle({ title, subtitle }: Props) {
+export function SectionTitle({ title, subtitle, actionLabel, onAction }: Props) {
   return (
     <View style={styles.container}>
-      <AppText size="xl" bold>
-        {title}
-      </AppText>
-      {subtitle ? (
-        <AppText size="sm" color="muted">
-          {subtitle}
-        </AppText>
+      <View style={styles.texts}>
+        <AppText variant="title3">{title}</AppText>
+        {subtitle ? (
+          <AppText variant="subhead" color="muted">
+            {subtitle}
+          </AppText>
+        ) : null}
+      </View>
+      {actionLabel && onAction ? (
+        <Pressable onPress={onAction} accessibilityRole="button" hitSlop={8}>
+          <AppText variant="callout" color="primary">
+            {actionLabel}
+          </AppText>
+        </Pressable>
       ) : null}
     </View>
   );
@@ -23,7 +35,13 @@ export function SectionTitle({ title, subtitle }: Props) {
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+  },
+  texts: {
+    flex: 1,
     gap: 2,
-    marginBottom: spacing.sm,
   },
 });

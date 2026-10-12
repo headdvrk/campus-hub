@@ -7,16 +7,19 @@ import { radius, spacing } from '../styles/theme';
 type Props = {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
+  padded?: boolean;
 };
 
-export function Card({ children, style }: Props) {
+// Жұмсақ көлеңкесі бар дөңгелек бұрышты карточка
+export function Card({ children, style, padded = true }: Props) {
   const { colors } = useSettings();
 
   return (
     <View
       style={[
         styles.card,
-        { backgroundColor: colors.card, borderColor: colors.border },
+        padded && styles.padded,
+        { backgroundColor: colors.card, shadowColor: colors.shadow },
         style,
       ]}
     >
@@ -28,7 +31,12 @@ export function Card({ children, style }: Props) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: radius.lg,
-    borderWidth: 1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 2,
+  },
+  padded: {
     padding: spacing.md,
     gap: spacing.sm,
   },

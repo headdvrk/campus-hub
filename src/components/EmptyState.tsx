@@ -6,6 +6,7 @@ import { IconName } from '../types/service';
 import { useSettings } from '../context/SettingsContext';
 import { spacing } from '../styles/theme';
 import { AppText } from './AppText';
+import { FadeIn } from './FadeIn';
 import { PrimaryButton } from './PrimaryButton';
 
 type Props = {
@@ -27,9 +28,11 @@ export function EmptyState({
   const { colors } = useSettings();
 
   return (
-    <View style={styles.container}>
-      <Ionicons name={icon} size={56} color={colors.muted} />
-      <AppText size="xl" bold center>
+    <FadeIn style={styles.container}>
+      <View style={[styles.iconCircle, { backgroundColor: colors.iconBackground }]}>
+        <Ionicons name={icon} size={40} color={colors.primary} />
+      </View>
+      <AppText variant="title2" center>
         {title}
       </AppText>
       {message ? (
@@ -40,7 +43,7 @@ export function EmptyState({
       {actionLabel && onAction ? (
         <PrimaryButton title={actionLabel} onPress={onAction} />
       ) : null}
-    </View>
+    </FadeIn>
   );
 }
 
@@ -48,10 +51,20 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
     gap: spacing.sm,
   },
-  message: {
+  iconCircle: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: spacing.sm,
+  },
+  message: {
+    marginBottom: spacing.md,
+    maxWidth: 320,
   },
 });
