@@ -20,12 +20,16 @@ export function LoginScreen({ navigation }: Props) {
   const { colors, scale, t } = useSettings();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
 
   const handleLogin = () => {
     if (!login.trim() || password.length < 6) {
-      Alert.alert(t('errorTitle'), t('loginError'));
+      setError(true);
+      // Браузерде Alert көрсетілмейді, сондықтан қате формада да шығады
+      if (Platform.OS !== 'web') Alert.alert(t('errorTitle'), t('loginError'));
       return;
     }
+    setError(false);
     navigation.replace('Main');
   };
 
@@ -76,6 +80,12 @@ export function LoginScreen({ navigation }: Props) {
           secureTextEntry
           onSubmitEditing={handleLogin}
         />
+
+        {error ? (
+          <AppText size="sm" color="danger" center>
+            {t('loginError')}
+          </AppText>
+        ) : null}
 
         <PrimaryButton title={t('loginButton')} onPress={handleLogin} />
       </Card>
