@@ -3,15 +3,17 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 
 import { RootStackParamList } from '../types/navigation';
+import { PrimaryButton } from '../components';
+import { colors, fontSize, radius, spacing } from '../styles/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -33,14 +35,19 @@ export function LoginScreen({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.card}>
-        <Text style={styles.logo}>🎓</Text>
+        <Ionicons
+          name="school"
+          size={56}
+          color={colors.primary}
+          style={styles.logo}
+        />
         <Text style={styles.title}>Campus Hub</Text>
         <Text style={styles.subtitle}>Жүйеге кіру</Text>
 
         <TextInput
           style={styles.input}
           placeholder="Логин"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.muted}
           value={login}
           onChangeText={setLogin}
           autoCapitalize="none"
@@ -49,19 +56,14 @@ export function LoginScreen({ navigation }: Props) {
         <TextInput
           style={styles.input}
           placeholder="Құпиясөз (кемінде 6 таңба)"
-          placeholderTextColor="#64748B"
+          placeholderTextColor={colors.muted}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           onSubmitEditing={handleLogin}
         />
 
-        <Pressable
-          style={({ pressed }) => [styles.button, pressed && styles.pressed]}
-          onPress={handleLogin}
-        >
-          <Text style={styles.buttonText}>Кіру</Text>
-        </Pressable>
+        <PrimaryButton title="Кіру" onPress={handleLogin} />
       </View>
     </KeyboardAvoidingView>
   );
@@ -71,53 +73,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#F4F8FC',
+    padding: spacing.lg,
+    backgroundColor: colors.background,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
-    gap: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    gap: spacing.md - 4,
   },
   logo: {
-    fontSize: 48,
-    textAlign: 'center',
+    alignSelf: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: fontSize.xxl,
     fontWeight: '700',
     textAlign: 'center',
-    color: '#0F172A',
+    color: colors.text,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: fontSize.md,
     textAlign: 'center',
-    color: '#64748B',
-    marginBottom: 8,
+    color: colors.muted,
+    marginBottom: spacing.sm,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#D9E2EC',
-    borderRadius: 12,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
-    color: '#0F172A',
-  },
-  button: {
-    backgroundColor: '#0B66E4',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  pressed: {
-    opacity: 0.8,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: fontSize.md,
+    color: colors.text,
   },
 });

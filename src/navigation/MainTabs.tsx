@@ -1,18 +1,20 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 
 import { MainTabParamList } from '../types/navigation';
+import { IconName } from '../types/service';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ServicesScreen } from '../screens/ServicesScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { colors } from '../styles/theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const tabIcons: Record<keyof MainTabParamList, string> = {
-  Home: '🏠',
-  Services: '🧩',
-  Profile: '👤',
+const tabIcons: Record<keyof MainTabParamList, [IconName, IconName]> = {
+  Home: ['home', 'home-outline'],
+  Services: ['grid', 'grid-outline'],
+  Profile: ['person', 'person-outline'],
 };
 
 export function MainTabs() {
@@ -20,13 +22,14 @@ export function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#0B66E4',
-        tabBarInactiveTintColor: '#64748B',
-        tabBarIcon: ({ focused }) => (
-          <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>
-            {tabIcons[route.name]}
-          </Text>
-        ),
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.muted,
+        tabBarIcon: ({ focused, color, size }) => {
+          const [active, inactive] = tabIcons[route.name];
+          return (
+            <Ionicons name={focused ? active : inactive} size={size} color={color} />
+          );
+        },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Басты' }} />

@@ -1,10 +1,14 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { MainTabParamList, RootStackParamList } from '../types/navigation';
+import { Service } from '../types/service';
+import { services } from '../data/services';
+import { EmptyState, SectionTitle, ServiceCard } from '../components';
+import { colors, spacing } from '../styles/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Services'>,
@@ -12,83 +16,48 @@ type Props = CompositeScreenProps<
 >;
 
 export function ServicesScreen({ navigation }: Props) {
+  const openService = (service: Service) => {
+    navigation.navigate('Details', {
+      serviceId: service.id,
+      title: service.title,
+    });
+  };
+
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Сервистер</Text>
-
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-        onPress={() =>
-          navigation.navigate('Details', { serviceId: 'library', title: 'Кітапхана' })
-        }
-      >
-        <Text style={styles.cardTitle}>📚 Кітапхана</Text>
-        <Text style={styles.cardText}>Кітаптар мен оқу орындары</Text>
-      </Pressable>
-
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-        onPress={() =>
-          navigation.navigate('Details', { serviceId: 'schedule', title: 'Кесте' })
-        }
-      >
-        <Text style={styles.cardTitle}>📅 Кесте</Text>
-        <Text style={styles.cardText}>Сабақтар мен емтихандар</Text>
-      </Pressable>
-
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-        onPress={() =>
-          navigation.navigate('Details', { serviceId: 'canteen', title: 'Асхана' })
-        }
-      >
-        <Text style={styles.cardTitle}>🍽️ Асхана</Text>
-        <Text style={styles.cardText}>Күнделікті мәзір мен жұмыс уақыты</Text>
-      </Pressable>
-
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-        onPress={() =>
-          navigation.navigate('Details', { serviceId: 'dormitory', title: 'Жатақхана' })
-        }
-      >
-        <Text style={styles.cardTitle}>🏠 Жатақхана</Text>
-        <Text style={styles.cardText}>Орналасу және өтініш беру</Text>
-      </Pressable>
-    </ScrollView>
+    <FlatList
+      style={styles.list}
+      contentContainerStyle={styles.content}
+      data={services}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={
+        <SectionTitle
+          title="Сервистер"
+          subtitle={`Кампустағы ${services.length} қызмет`}
+        />
+      }
+      renderItem={({ item }) => (
+        <ServiceCard service={item} onPress={openService} />
+      )}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      ListEmptyComponent={
+        <EmptyState
+          title="Сервистер жоқ"
+          message="Қазір қолжетімді сервистер табылмады"
+        />
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  list: {
     flex: 1,
-    backgroundColor: '#F4F8FC',
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 16,
-    gap: 12,
+    padding: spacing.md,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    gap: 4,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  cardText: {
-    fontSize: 15,
-    color: '#64748B',
+  separator: {
+    height: spacing.md - 4,
   },
 });

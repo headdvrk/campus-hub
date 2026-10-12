@@ -1,48 +1,50 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { MainTabParamList, RootStackParamList } from '../types/navigation';
+import { Service } from '../types/service';
+import { services } from '../data/services';
+import { student } from '../data/student';
+import { PrimaryButton, SectionTitle, ServiceCard } from '../components';
+import { colors, fontSize, radius, spacing } from '../styles/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Home'>,
   NativeStackScreenProps<RootStackParamList>
 >;
 
+const featured = services.slice(0, 2);
+
 export function HomeScreen({ navigation }: Props) {
+  const openService = (service: Service) => {
+    navigation.navigate('Details', {
+      serviceId: service.id,
+      title: service.title,
+    });
+  };
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Campus Hub</Text>
+        <Text style={styles.heroTitle}>Сәлем, {student.name.split(' ')[1]}!</Text>
         <Text style={styles.heroText}>
-          Университеттің цифрлық кампусына қош келдіңіз
+          Campus Hub — университеттің цифрлық кампусы
         </Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Жылдам әрекеттер</Text>
+      <SectionTitle title="Жылдам әрекеттер" subtitle="Жиі қолданылатын сервистер" />
+      {featured.map((service) => (
+        <ServiceCard key={service.id} service={service} onPress={openService} />
+      ))}
 
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-        onPress={() =>
-          navigation.navigate('Details', {
-            serviceId: 'library',
-            title: 'Кітапхана',
-          })
-        }
-      >
-        <Text style={styles.cardTitle}>📚 Кітапхананы ашу</Text>
-        <Text style={styles.cardText}>Кітаптар мен оқу орындары</Text>
-      </Pressable>
-
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      <PrimaryButton
+        title="Барлық сервистер"
+        variant="outline"
         onPress={() => navigation.navigate('Services')}
-      >
-        <Text style={styles.cardTitle}>🧩 Барлық сервистер</Text>
-        <Text style={styles.cardText}>Кампустың барлық қызметтерінің тізімі</Text>
-      </Pressable>
+      />
     </ScrollView>
   );
 }
@@ -50,49 +52,26 @@ export function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F4F8FC',
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 16,
-    gap: 12,
+    padding: spacing.md,
+    gap: spacing.md - 4,
   },
   hero: {
-    backgroundColor: '#0B66E4',
-    borderRadius: 20,
+    backgroundColor: colors.primary,
+    borderRadius: radius.xl,
     padding: 20,
     gap: 6,
+    marginBottom: spacing.sm,
   },
   heroTitle: {
-    color: '#FFFFFF',
+    color: colors.onPrimary,
     fontSize: 26,
     fontWeight: '700',
   },
   heroText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginTop: 8,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    gap: 4,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#0F172A',
-  },
-  cardText: {
-    fontSize: 15,
-    color: '#64748B',
+    color: colors.onPrimary,
+    fontSize: fontSize.md,
   },
 });
