@@ -1,16 +1,3 @@
-App.tsx
-src/
-├── components/   қайта пайдаланылатын UI элементтері
-├── context/      SettingsContext (күй + AsyncStorage)
-├── data/         сервистер мен студент деректері
-├── i18n/         kk / ru / en аудармалары
-├── navigation/   RootNavigator (Stack), MainTabs (Tabs)
-├── screens/      қосымша экрандары
-├── styles/       аралықтар, радиустар, қаріп өлшемдері
-├── theme/        ашық және қараңғы тақырып түстері
-├── types/        TypeScript типтері
-└── utils/        анимация/haptics көмекшілері, күн форматы
-```
 
 ## Іске қосу
 
