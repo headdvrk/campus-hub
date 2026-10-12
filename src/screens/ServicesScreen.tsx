@@ -7,8 +7,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainTabParamList, RootStackParamList } from '../types/navigation';
 import { Service } from '../types/service';
 import { services } from '../data/services';
+import { useSettings } from '../context/SettingsContext';
 import { EmptyState, SectionTitle, ServiceCard } from '../components';
-import { colors, spacing } from '../styles/theme';
+import { spacing } from '../styles/theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Services'>,
@@ -16,23 +17,25 @@ type Props = CompositeScreenProps<
 >;
 
 export function ServicesScreen({ navigation }: Props) {
+  const { colors, language, t } = useSettings();
+
   const openService = (service: Service) => {
     navigation.navigate('Details', {
       serviceId: service.id,
-      title: service.title,
+      title: service.title[language],
     });
   };
 
   return (
     <FlatList
-      style={styles.list}
+      style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.content}
       data={services}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={
         <SectionTitle
-          title="Сервистер"
-          subtitle={`Кампустағы ${services.length} қызмет`}
+          title={t('servicesTitle')}
+          subtitle={t('servicesCount', { count: services.length })}
         />
       }
       renderItem={({ item }) => (
@@ -41,8 +44,8 @@ export function ServicesScreen({ navigation }: Props) {
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       ListEmptyComponent={
         <EmptyState
-          title="Сервистер жоқ"
-          message="Қазір қолжетімді сервистер табылмады"
+          title={t('servicesEmptyTitle')}
+          message={t('servicesEmptyMessage')}
         />
       }
     />
@@ -50,10 +53,6 @@ export function ServicesScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  list: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
   content: {
     padding: spacing.md,
   },

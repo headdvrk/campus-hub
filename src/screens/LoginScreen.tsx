@@ -4,49 +4,63 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
   TextInput,
-  View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import { RootStackParamList } from '../types/navigation';
-import { PrimaryButton } from '../components';
-import { colors, fontSize, radius, spacing } from '../styles/theme';
+import { useSettings } from '../context/SettingsContext';
+import { AppText, Card, PrimaryButton } from '../components';
+import { fontSize, radius, spacing } from '../styles/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 export function LoginScreen({ navigation }: Props) {
+  const { colors, scale, t } = useSettings();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
     if (!login.trim() || password.length < 6) {
-      Alert.alert('Қате', 'Логинді және кемінде 6 таңбалы құпиясөзді енгізіңіз');
+      Alert.alert(t('errorTitle'), t('loginError'));
       return;
     }
     navigation.replace('Main');
   };
 
+  const inputStyle = [
+    styles.input,
+    {
+      borderColor: colors.border,
+      color: colors.text,
+      backgroundColor: colors.background,
+      fontSize: scale(fontSize.md),
+    },
+  ];
+
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={styles.card}>
+      <Card style={styles.card}>
         <Ionicons
           name="school"
           size={56}
           color={colors.primary}
           style={styles.logo}
         />
-        <Text style={styles.title}>Campus Hub</Text>
-        <Text style={styles.subtitle}>Жүйеге кіру</Text>
+        <AppText size="xxl" bold center>
+          Campus Hub
+        </AppText>
+        <AppText color="muted" center style={styles.subtitle}>
+          {t('loginSubtitle')}
+        </AppText>
 
         <TextInput
-          style={styles.input}
-          placeholder="Логин"
+          style={inputStyle}
+          placeholder={t('loginPlaceholder')}
           placeholderTextColor={colors.muted}
           value={login}
           onChangeText={setLogin}
@@ -54,8 +68,8 @@ export function LoginScreen({ navigation }: Props) {
           autoCorrect={false}
         />
         <TextInput
-          style={styles.input}
-          placeholder="Құпиясөз (кемінде 6 таңба)"
+          style={inputStyle}
+          placeholder={t('passwordPlaceholder')}
           placeholderTextColor={colors.muted}
           value={password}
           onChangeText={setPassword}
@@ -63,8 +77,8 @@ export function LoginScreen({ navigation }: Props) {
           onSubmitEditing={handleLogin}
         />
 
-        <PrimaryButton title="Кіру" onPress={handleLogin} />
-      </View>
+        <PrimaryButton title={t('loginButton')} onPress={handleLogin} />
+      </Card>
     </KeyboardAvoidingView>
   );
 }
@@ -74,10 +88,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: spacing.lg,
-    backgroundColor: colors.background,
   },
   card: {
-    backgroundColor: colors.surface,
     borderRadius: radius.xl,
     padding: spacing.lg,
     gap: spacing.md - 4,
@@ -85,25 +97,13 @@ const styles = StyleSheet.create({
   logo: {
     alignSelf: 'center',
   },
-  title: {
-    fontSize: fontSize.xxl,
-    fontWeight: '700',
-    textAlign: 'center',
-    color: colors.text,
-  },
   subtitle: {
-    fontSize: fontSize.md,
-    textAlign: 'center',
-    color: colors.muted,
     marginBottom: spacing.sm,
   },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.md,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: fontSize.md,
-    color: colors.text,
   },
 });

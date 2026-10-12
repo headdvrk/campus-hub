@@ -1,7 +1,9 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
-import { colors, fontSize, radius, spacing } from '../styles/theme';
+import { useSettings } from '../context/SettingsContext';
+import { radius, spacing } from '../styles/theme';
+import { AppText } from './AppText';
 
 type Props = {
   title: string;
@@ -10,6 +12,7 @@ type Props = {
 };
 
 export function PrimaryButton({ title, onPress, variant = 'primary' }: Props) {
+  const { colors } = useSettings();
   const filled = variant === 'primary';
   const accent = variant === 'danger' ? colors.danger : colors.primary;
 
@@ -26,9 +29,9 @@ export function PrimaryButton({ title, onPress, variant = 'primary' }: Props) {
         pressed && styles.pressed,
       ]}
     >
-      <Text style={[styles.text, { color: filled ? colors.onPrimary : accent }]}>
+      <AppText bold style={{ color: filled ? colors.onPrimary : accent }}>
         {title}
-      </Text>
+      </AppText>
     </Pressable>
   );
 }
@@ -43,9 +46,5 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.75,
-  },
-  text: {
-    fontSize: fontSize.md,
-    fontWeight: '700',
   },
 });

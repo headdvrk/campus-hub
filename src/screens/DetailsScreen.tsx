@@ -1,37 +1,44 @@
-import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useLayoutEffect } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import { RootStackParamList } from '../types/navigation';
 import { findService } from '../data/services';
-import { EmptyState, PrimaryButton } from '../components';
-import { colors, fontSize, radius, spacing } from '../styles/theme';
+import { useSettings } from '../context/SettingsContext';
+import { AppText, Card, EmptyState, PrimaryButton } from '../components';
+import { radius, spacing } from '../styles/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Details'>;
 
 export function DetailsScreen({ route, navigation }: Props) {
+  const { colors, language, t } = useSettings();
   const params = route.params as Props['route']['params'] | undefined;
+  const service = params?.serviceId ? findService(params.serviceId) : undefined;
 
   // Параметрсіз ашылған қате маршрутты NotFound экранына ауыстыру
   useEffect(() => {
     if (!params?.serviceId) navigation.replace('NotFound');
   }, [params, navigation]);
 
-  if (!params?.serviceId) return null;
+  // Тіл ауысқанда тақырып та аударылады
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: service?.title[language] ?? params?.title ?? t('detailsDefaultTitle'),
+    });
+  }, [navigation, service, language, params, t]);
 
-  const { serviceId, title } = params;
-  const service = findService(serviceId);
+  if (!params?.serviceId) return null;
 
   // Белгісіз ID берілсе, экран құламай, түсінікті хабар көрсетеді
   if (!service) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
         <EmptyState
           icon="alert-circle-outline"
-          title="Сервис табылмады"
-          message={`«${serviceId}» ID-і бар сервис жоқ`}
-          actionLabel="Артқа"
+          title={t('serviceNotFound')}
+          message={t('serviceNotFoundMessage', { id: params.serviceId })}
+          actionLabel={t('back')}
           onAction={() => navigation.goBack()}
         />
       </View>
@@ -39,26 +46,29 @@ export function DetailsScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={styles.card}>
-        <View style={styles.iconBox}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      contentContainerStyle={styles.content}
+    >
+      <Card style={styles.card}>
+        <View style={[styles.iconBox, { backgroundColor: colors.iconBackground }]}>
           <Ionicons name={service.icon} size={36} color={colors.primary} />
         </View>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.id}>ID: {serviceId}</Text>
-        <Text style={styles.description}>{service.details}</Text>
-      </View>
+        <AppText size="xxl" bold>
+          {service.title[language]}
+        </AppText>
+        <AppText size="sm" color="muted">
+          ID: {service.id}
+        </AppText>
+        <AppText>{service.details[language]}</AppText>
+      </Card>
 
-      <PrimaryButton title="Артқа" onPress={() => navigation.goBack()} />
+      <PrimaryButton title={t('back')} onPress={() => navigation.goBack()} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
   content: {
     padding: spacing.md,
     gap: spacing.md,
@@ -66,34 +76,15 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: colors.background,
   },
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
     padding: 20,
-    gap: spacing.sm,
   },
   iconBox: {
     width: 64,
     height: 64,
     borderRadius: radius.lg,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  id: {
-    fontSize: fontSize.sm,
-    color: colors.muted,
-  },
-  description: {
-    fontSize: fontSize.md,
-    lineHeight: 23,
-    color: colors.text,
   },
 });

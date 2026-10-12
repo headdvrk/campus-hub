@@ -1,13 +1,5 @@
-export const colors = {
-  primary: '#0B66E4',
-  background: '#F4F8FC',
-  surface: '#FFFFFF',
-  text: '#0F172A',
-  muted: '#64748B',
-  border: '#D9E2EC',
-  danger: '#DC2626',
-  onPrimary: '#FFFFFF',
-};
+// Түстер №7 зертханалық жұмыстан бастап src/theme/themes.ts ішінде
+// (ашық және қараңғы тақырып). Мұнда тек тақырыпқа тәуелсіз өлшемдер қалады.
 
 export const spacing = {
   xs: 4,
@@ -22,6 +14,7 @@ export const radius = {
   xl: 20,
 };
 
+// "Қалыпты" қаріп масштабындағы өлшемдер; useSettings().scale() арқылы өзгереді
 export const fontSize = {
   sm: 14,
   md: 16,

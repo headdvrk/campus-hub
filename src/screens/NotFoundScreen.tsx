@@ -3,20 +3,22 @@ import { StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../types/navigation';
+import { useSettings } from '../context/SettingsContext';
 import { EmptyState } from '../components';
-import { colors } from '../styles/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'NotFound'>;
 
 // Белгісіз маршрут немесе қате параметр болғанда көрсетіледі
 export function NotFoundScreen({ navigation }: Props) {
+  const { colors, t } = useSettings();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <EmptyState
         icon="compass-outline"
-        title="Бет табылмады"
-        message="Сұралған экран жоқ немесе оған қате деректер берілді."
-        actionLabel="Басты бетке қайту"
+        title={t('notFoundTitle')}
+        message={t('notFoundMessage')}
+        actionLabel={t('goHome')}
         onAction={() => navigation.navigate('Main', { screen: 'Home' })}
       />
     </View>
@@ -27,6 +29,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: colors.background,
   },
 });

@@ -1,31 +1,29 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { colors, fontSize, spacing } from '../styles/theme';
+import { spacing } from '../styles/theme';
+import { AppText } from './AppText';
 
 type Props = { title: string; subtitle?: string };
 
 export function SectionTitle({ title, subtitle }: Props) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <AppText size="xl" bold>
+        {title}
+      </AppText>
+      {subtitle ? (
+        <AppText size="sm" color="muted">
+          {subtitle}
+        </AppText>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.xs,
+    gap: 2,
     marginBottom: spacing.sm,
-  },
-  title: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  subtitle: {
-    fontSize: fontSize.sm,
-    color: colors.muted,
   },
 });

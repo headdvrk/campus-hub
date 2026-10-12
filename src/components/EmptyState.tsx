@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { IconName } from '../types/service';
-import { colors, fontSize, spacing } from '../styles/theme';
+import { useSettings } from '../context/SettingsContext';
+import { spacing } from '../styles/theme';
+import { AppText } from './AppText';
 import { PrimaryButton } from './PrimaryButton';
 
 type Props = {
@@ -22,11 +24,19 @@ export function EmptyState({
   actionLabel,
   onAction,
 }: Props) {
+  const { colors } = useSettings();
+
   return (
     <View style={styles.container}>
       <Ionicons name={icon} size={56} color={colors.muted} />
-      <Text style={styles.title}>{title}</Text>
-      {message ? <Text style={styles.message}>{message}</Text> : null}
+      <AppText size="xl" bold center>
+        {title}
+      </AppText>
+      {message ? (
+        <AppText color="muted" center style={styles.message}>
+          {message}
+        </AppText>
+      ) : null}
       {actionLabel && onAction ? (
         <PrimaryButton title={actionLabel} onPress={onAction} />
       ) : null}
@@ -41,16 +51,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.sm,
   },
-  title: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    color: colors.text,
-    textAlign: 'center',
-  },
   message: {
-    fontSize: fontSize.md,
-    color: colors.muted,
-    textAlign: 'center',
     marginBottom: spacing.sm,
   },
 });

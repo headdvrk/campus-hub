@@ -1,19 +1,27 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Student } from '../types/student';
-import { colors, fontSize, spacing } from '../styles/theme';
+import { useSettings } from '../context/SettingsContext';
+import { spacing } from '../styles/theme';
+import { AppText } from './AppText';
 
 type Props = { student: Student };
 
 export function ProfileHeader({ student }: Props) {
+  const { colors } = useSettings();
+
   return (
     <View style={styles.container}>
-      <View style={styles.avatar}>
-        <Text style={styles.initials}>{student.initials}</Text>
+      <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+        <AppText size="xxl" bold color="onPrimary">
+          {student.initials}
+        </AppText>
       </View>
-      <Text style={styles.name}>{student.name}</Text>
-      <Text style={styles.group}>{student.group}</Text>
+      <AppText size="xl" bold>
+        {student.name}
+      </AppText>
+      <AppText color="muted">{student.group}</AppText>
     </View>
   );
 }
@@ -27,23 +35,8 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
-  },
-  initials: {
-    color: colors.onPrimary,
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  name: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  group: {
-    fontSize: fontSize.md,
-    color: colors.muted,
   },
 });
