@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { ActivityIndicator, Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 
 import { themes } from '../theme/themes';
 import { useNativeDriver } from '../utils/motion';
@@ -39,15 +38,20 @@ export function SplashScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <Animated.View
+      <Animated.Image
+        source={require('../../assets/alt-logo.png')}
+        resizeMode="contain"
+        tintColor="#FFFFFF"
+        accessibilityLabel="ALT University"
         style={[
           styles.logo,
-          { transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] }) }] },
+          { transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] }) }] },
         ]}
-      >
-        <Ionicons name="school" size={52} color={themes.light.hero[0]} />
-      </Animated.View>
-      <Text style={styles.title}>Campus Hub</Text>
+      />
+      <View style={styles.titles}>
+        <Text style={styles.title}>Campus Hub</Text>
+        <Text style={styles.university}>ALT University</Text>
+      </View>
       <View style={styles.loader}>
         <ActivityIndicator color="#FFFFFF" />
       </View>
@@ -63,23 +67,23 @@ const styles = StyleSheet.create({
     gap: 18,
   },
   logo: {
-    width: 100,
-    height: 100,
-    borderRadius: 28,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.22,
-    shadowRadius: 24,
-    elevation: 10,
+    width: 160,
+    height: 92,
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
     letterSpacing: 0.4,
     color: '#FFFFFF',
+  },
+  titles: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  university: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   loader: {
     marginTop: 8,

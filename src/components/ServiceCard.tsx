@@ -25,12 +25,12 @@ export function ServiceCard({ service, onPress }: Props) {
       containerStyle={styles.container}
       style={[
         styles.card,
-        { backgroundColor: colors.card, shadowColor: colors.shadow },
+        { backgroundColor: colors.card, borderColor: colors.border, shadowColor: colors.shadow },
       ]}
     >
       <View style={styles.top}>
         <GradientIcon icon={service.icon} colors={service.gradient} size={44} />
-        <Ionicons name="arrow-forward-circle" size={22} color={colors.separator} />
+        <Ionicons name="arrow-forward-circle" size={22} color={colors.muted} />
       </View>
       <View style={styles.texts}>
         <AppText variant="headline" numberOfLines={1}>
@@ -51,14 +51,14 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     minHeight: 150,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
+    borderWidth: 1,
     padding: spacing.md,
     justifyContent: 'space-between',
     gap: spacing.md,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 2,
+    shadowRadius: 24,
   },
   top: {
     flexDirection: 'row',

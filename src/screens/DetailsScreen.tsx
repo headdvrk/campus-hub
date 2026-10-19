@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, View } from 'react-native';
+import { Animated, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import { findService } from '../data/services';
 import { useSettings } from '../context/SettingsContext';
 import {
   AppText,
+  Backdrop,
   Card,
   EmptyState,
   FadeIn,
@@ -47,6 +48,7 @@ export function DetailsScreen({ route, navigation }: Props) {
   if (!service) {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
+        <Backdrop />
         <EmptyState
           icon="alert-circle-outline"
           title={t('serviceNotFound')}
@@ -71,6 +73,7 @@ export function DetailsScreen({ route, navigation }: Props) {
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]}>
+      <Backdrop />
       <Animated.View
         style={[
           styles.hero,
@@ -115,7 +118,9 @@ export function DetailsScreen({ route, navigation }: Props) {
           </FadeIn>
         </View>
 
-        <View style={[styles.sheet, { backgroundColor: colors.background }]}>
+        <View style={[styles.sheet, styles.clip, { backgroundColor: colors.background }]}>
+
+          <Backdrop />
           <FadeIn delay={140}>
             <Card>
               <AppText variant="headline">{t('about')}</AppText>
@@ -125,12 +130,14 @@ export function DetailsScreen({ route, navigation }: Props) {
 
           <FadeIn delay={200}>
             <ListGroup>
-              <ListRow
-                icon="time"
-                iconColors={['#FF9F0A', '#FF6B00']}
-                title={t('hours')}
-                value={service.hours}
-              />
+              {service.hours ? (
+                <ListRow
+                  icon="time"
+                  iconColors={['#FF9F0A', '#FF6B00']}
+                  title={t('hours')}
+                  value={service.hours}
+                />
+              ) : null}
               <ListRow
                 icon="location"
                 iconColors={['#30D158', '#00A86B']}
@@ -138,16 +145,22 @@ export function DetailsScreen({ route, navigation }: Props) {
                 value={service.location[language]}
                 stacked
               />
-              <ListRow
-                icon="pricetag"
-                iconColors={['#8E8E93', '#636366']}
-                title="ID"
-                value={service.id}
-              />
+              {service.phone ? (
+                <ListRow
+                  icon="call"
+                  iconColors={['#64D2FF', '#0A84FF']}
+                  title={t('phone')}
+                  value={service.phone}
+                  onPress={() => Linking.openURL('tel:' + service.phone!.replace(/\s/g, ''))}
+                />
+              ) : null}
             </ListGroup>
           </FadeIn>
 
           <FadeIn delay={260}>
+            <PrimaryButton title={t('openOnSite')} onPress={() => Linking.openURL(service.link)} />
+          </FadeIn>
+          <FadeIn delay={300}>
             <PrimaryButton title={t('back')} variant="tinted" onPress={() => navigation.goBack()} />
           </FadeIn>
         </View>
@@ -157,6 +170,7 @@ export function DetailsScreen({ route, navigation }: Props) {
         onPress={goBack}
         accessibilityRole="button"
         accessibilityLabel={t('back')}
+        hitSlop={4}
         style={({ pressed }) => [
           styles.backButton,
           { top: insets.top + spacing.sm, opacity: pressed ? 0.7 : 1 },
@@ -216,6 +230,10 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     gap: spacing.md,
     minHeight: 500,
+  },
+  // Фон суреті дөңгелек бұрыштардан шықпауы үшін
+  clip: {
+    overflow: 'hidden',
   },
   backButton: {
     position: 'absolute',

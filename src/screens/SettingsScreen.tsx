@@ -3,6 +3,8 @@ import { Animated, StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 import { useSettings } from '../context/SettingsContext';
 import { languageNames } from '../i18n/translations';
 import { themes } from '../theme/themes';
@@ -127,7 +129,7 @@ function Toast({ text, visible }: { text: string; visible: boolean }) {
   );
 }
 
-export function SettingsScreen() {
+export function SettingsScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Settings'>) {
   const {
     theme,
     fontScale,
@@ -154,7 +156,7 @@ export function SettingsScreen() {
 
   return (
     <View style={styles.flex}>
-      <Screen title={t('tabSettings')}>
+      <Screen title={t('tabSettings')} onBack={() => navigation.goBack()}>
         <FadeIn delay={40}>
           <GroupLabel>{t('appearance')}</GroupLabel>
         </FadeIn>

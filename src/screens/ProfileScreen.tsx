@@ -1,14 +1,14 @@
 import React from 'react';
+import { Linking } from 'react-native';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import {
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { MainTabParamList, RootStackParamList } from '../types/navigation';
-import { student } from '../data/student';
+import { facultyKey } from '../types/profile';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth, useProfile } from '../context/AuthContext';
+import { overallGpa } from './JournalScreen';
 import { languageNames } from '../i18n/translations';
 import {
   AppText,
@@ -32,19 +32,14 @@ const fontScaleKey = {
 
 export function ProfileScreen({ navigation }: Props) {
   const { theme, fontScale, language, t } = useSettings();
+  const { signOut } = useAuth();
+  const profile = useProfile();
   const openSettings = () => navigation.navigate('Settings');
-
-  // Шығу: тарихты тазалап, Login экранына қайтару
-  const handleLogout = () => {
-    navigation
-      .getParent<NativeStackNavigationProp<RootStackParamList>>()
-      ?.reset({ index: 0, routes: [{ name: 'Login' }] });
-  };
 
   return (
     <Screen title={t('tabProfile')}>
       <FadeIn>
-        <ProfileHeader student={student} />
+        <ProfileHeader profile={profile} />
       </FadeIn>
 
       <FadeIn delay={80}>
@@ -56,22 +51,37 @@ export function ProfileScreen({ navigation }: Props) {
         <ListGroup>
           <ListRow
             icon="school"
-            iconColors={['#0A84FF', '#0060DF']}
-            title={t('program')}
-            value={student.program[language]}
+            iconColors={['#005DAC', '#091A2C']}
+            title={t('authFaculty')}
+            value={t(facultyKey[profile.faculty])}
             stacked
           />
           <ListRow
             icon="people"
             iconColors={['#5E5CE6', '#3634A3']}
             title={t('group')}
-            value={student.group}
+            value={profile.group}
           />
           <ListRow
             icon="ribbon"
-            iconColors={['#FF9F0A', '#FF6B00']}
-            title={t('course')}
-            value={t('courseValue', { n: student.course })}
+            iconColors={['#FF9900', '#C46A00']}
+            title={t('transcript')}
+            value={`GPA ${overallGpa?.toFixed(2) ?? '—'}`}
+            onPress={() => navigation.navigate('Transcript')}
+          />
+          <ListRow
+            icon="mail"
+            iconColors={['#0C71C3', '#005DAC']}
+            title={t('authEmail')}
+            value={profile.email}
+            stacked
+          />
+          <ListRow
+            icon="call"
+            iconColors={['#30D158', '#00A86B']}
+            title={t('authPhone')}
+            value={profile.phone}
+            onPress={() => Linking.openURL('tel:' + profile.phone.replace(/\s/g, ''))}
           />
         </ListGroup>
       </FadeIn>
@@ -109,7 +119,7 @@ export function ProfileScreen({ navigation }: Props) {
 
       <FadeIn delay={260}>
         <ListGroup>
-          <ListRow title={t('logout')} destructive chevron={false} onPress={handleLogout} />
+          <ListRow title={t('logout')} destructive chevron={false} onPress={signOut} />
         </ListGroup>
       </FadeIn>
     </Screen>

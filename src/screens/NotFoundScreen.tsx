@@ -4,7 +4,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { RootStackParamList } from '../types/navigation';
 import { useSettings } from '../context/SettingsContext';
-import { EmptyState } from '../components';
+import {
+  Backdrop,
+  EmptyState,
+} from '../components';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'NotFound'>;
 
@@ -14,6 +17,7 @@ export function NotFoundScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Backdrop />
       <EmptyState
         icon="compass-outline"
         title={t('notFoundTitle')}

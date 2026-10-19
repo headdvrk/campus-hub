@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -8,22 +8,25 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { MainTabParamList, RootStackParamList } from '../types/navigation';
 import { Service } from '../types/service';
+import { Announcement } from '../types/announcement';
 import { services } from '../data/services';
-import { news, todayLessons } from '../data/campus';
-import { student } from '../data/student';
+import { findSubject, lessonsOn } from '../data/academic';
+import { getAnnouncements, getCachedAnnouncements } from '../api/announcements';
 import { useSettings } from '../context/SettingsContext';
+import { useProfile } from '../context/AuthContext';
 import {
   AppText,
   Card,
   FadeIn,
   GradientIcon,
+  initials,
   ListGroup,
   PressableScale,
   Screen,
   SectionTitle,
 } from '../components';
 import { radius, spacing } from '../styles/theme';
-import { formatToday } from '../utils/date';
+import { clock, formatDate, formatToday } from '../utils/date';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Home'>,
@@ -31,10 +34,34 @@ type Props = CompositeScreenProps<
 >;
 
 const quickServices = services.slice(0, 4);
-const nextLesson = todayLessons[0];
 
 export function HomeScreen({ navigation }: Props) {
   const { colors, language, t } = useSettings();
+  const profile = useProfile();
+  const [latestNews, setLatestNews] = useState<Announcement[]>([]);
+
+  // Бүгінгі кесте және әлі аяқталмаған ең жақын сабақ
+  const todayLessons = lessonsOn(new Date().getDay());
+  const now = clock();
+  const nextLesson = todayLessons.find((lesson) => lesson.end > now) ?? null;
+  const nextSubject = nextLesson ? findSubject(nextLesson.subjectId) : undefined;
+
+  // Алдымен кэш бірден көрсетіледі, кейін сайттан жаңартылады;
+  // қате болса бөлім жай ғана кэшпен (немесе бос) қалады
+  useEffect(() => {
+    const controller = new AbortController();
+    let fresh = false;
+    getCachedAnnouncements(language).then((cached) => {
+      if (cached && !fresh && !controller.signal.aborted) setLatestNews(cached);
+    });
+    getAnnouncements(language, controller.signal)
+      .then((data) => {
+        fresh = true;
+        setLatestNews(data);
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [language]);
 
   const openService = (service: Service) => {
     navigation.navigate('Details', {
@@ -47,7 +74,7 @@ export function HomeScreen({ navigation }: Props) {
     <PressableScale onPress={() => navigation.navigate('Profile')} accessibilityLabel={t('tabProfile')}>
       <LinearGradient colors={colors.hero} style={styles.avatar}>
         <AppText variant="subhead" color="onPrimary" style={styles.bold}>
-          {student.initials}
+          {initials(profile)}
         </AppText>
       </LinearGradient>
     </PressableScale>
@@ -55,14 +82,18 @@ export function HomeScreen({ navigation }: Props) {
 
   return (
     <Screen
-      title={t('greeting', { name: student.firstName })}
+      title={t('greeting', { name: profile.firstName })}
       subtitle={formatToday(language)}
       right={avatar}
     >
       <FadeIn delay={50}>
         <PressableScale
           scaleTo={0.98}
-          onPress={() => openService(services[1])}
+          onPress={() =>
+            nextSubject
+              ? navigation.navigate('Subject', { subjectId: nextSubject.id })
+              : navigation.navigate('Schedule')
+          }
           style={styles.heroShadow}
         >
           <LinearGradient
@@ -74,7 +105,7 @@ export function HomeScreen({ navigation }: Props) {
             <View style={styles.heroCircle} />
             <View style={styles.heroTop}>
               <AppText variant="caption" color="onPrimary" style={styles.heroLabel}>
-                {t('nextLesson').toUpperCase()}
+                {(nextSubject ? t('nextLesson') : t('tabSchedule')).toUpperCase()}
               </AppText>
               <View style={styles.heroChip}>
                 <AppText variant="caption" color="onPrimary" style={styles.bold}>
@@ -83,22 +114,26 @@ export function HomeScreen({ navigation }: Props) {
               </View>
             </View>
             <AppText variant="title1" color="onPrimary">
-              {nextLesson.title[language]}
+              {nextSubject
+                ? nextSubject.title[language]
+                : t(todayLessons.length ? 'lessonsOver' : 'noLessonsToday')}
             </AppText>
-            <View style={styles.heroMeta}>
-              <View style={styles.metaItem}>
-                <Ionicons name="time-outline" size={16} color="#FFFFFF" />
-                <AppText variant="subhead" color="onPrimary">
-                  {nextLesson.start} – {nextLesson.end}
-                </AppText>
+            {nextLesson ? (
+              <View style={styles.heroMeta}>
+                <View style={styles.metaItem}>
+                  <Ionicons name="time-outline" size={16} color="#FFFFFF" />
+                  <AppText variant="subhead" color="onPrimary">
+                    {nextLesson.start} – {nextLesson.end}
+                  </AppText>
+                </View>
+                <View style={styles.metaItem}>
+                  <Ionicons name="location-outline" size={16} color="#FFFFFF" />
+                  <AppText variant="subhead" color="onPrimary">
+                    {t('room', { room: nextLesson.room })}
+                  </AppText>
+                </View>
               </View>
-              <View style={styles.metaItem}>
-                <Ionicons name="location-outline" size={16} color="#FFFFFF" />
-                <AppText variant="subhead" color="onPrimary">
-                  {t('room', { room: nextLesson.room })}
-                </AppText>
-              </View>
-            </View>
+            ) : null}
           </LinearGradient>
         </PressableScale>
       </FadeIn>
@@ -120,7 +155,7 @@ export function HomeScreen({ navigation }: Props) {
               accessibilityLabel={service.title[language]}
             >
               <GradientIcon icon={service.icon} colors={service.gradient} size={52} />
-              <AppText variant="caption" center numberOfLines={1}>
+              <AppText variant="caption" center numberOfLines={2}>
                 {service.title[language]}
               </AppText>
             </PressableScale>
@@ -129,41 +164,59 @@ export function HomeScreen({ navigation }: Props) {
       </FadeIn>
 
       <FadeIn delay={230}>
-        <SectionTitle title={t('schedule')} />
+        <SectionTitle
+          title={t('schedule')}
+          actionLabel={t('seeAll')}
+          onAction={() => navigation.navigate('Schedule')}
+        />
       </FadeIn>
       <FadeIn delay={280}>
-        <ListGroup>
-          {todayLessons.map((lesson, index) => (
-            <View key={lesson.id} style={styles.lesson}>
-              <View style={styles.lessonTime}>
-                <AppText variant="subhead" style={styles.bold}>
-                  {lesson.start}
-                </AppText>
-                <AppText variant="caption" color="muted">
-                  {lesson.end}
-                </AppText>
-              </View>
-              <View
-                style={[
-                  styles.lessonBar,
-                  { backgroundColor: index === 0 ? colors.primary : colors.separator },
-                ]}
-              />
-              <View style={styles.flex}>
-                <AppText variant="headline" numberOfLines={1}>
-                  {lesson.title[language]}
-                </AppText>
-                <AppText variant="footnote" color="muted">
-                  {t('room', { room: lesson.room })}
-                </AppText>
-              </View>
-            </View>
-          ))}
-        </ListGroup>
+        {todayLessons.length === 0 ? (
+          <Card>
+            <AppText color="muted">{t('noLessonsToday')}</AppText>
+          </Card>
+        ) : (
+          <ListGroup>
+            {todayLessons.map((lesson) => {
+              const subject = findSubject(lesson.subjectId);
+              const isNext = lesson.id === nextLesson?.id;
+              return (
+                <View key={lesson.id} style={styles.lesson}>
+                  <View style={styles.lessonTime}>
+                    <AppText variant="subhead" style={styles.bold}>
+                      {lesson.start}
+                    </AppText>
+                    <AppText variant="caption" color="muted">
+                      {lesson.end}
+                    </AppText>
+                  </View>
+                  <View
+                    style={[
+                      styles.lessonBar,
+                      { backgroundColor: isNext ? colors.accent : subject?.color ?? colors.separator },
+                    ]}
+                  />
+                  <View style={styles.flex}>
+                    <AppText variant="headline" numberOfLines={1}>
+                      {subject?.title[language]}
+                    </AppText>
+                    <AppText variant="footnote" color="muted">
+                      {t(lesson.type)} · {t('room', { room: lesson.room })}
+                    </AppText>
+                  </View>
+                </View>
+              );
+            })}
+          </ListGroup>
+        )}
       </FadeIn>
 
       <FadeIn delay={340}>
-        <SectionTitle title={t('news')} />
+        <SectionTitle
+          title={t('news')}
+          actionLabel={t('seeAll')}
+          onAction={() => navigation.navigate('News')}
+        />
       </FadeIn>
       <FadeIn delay={390}>
         <ScrollView
@@ -172,18 +225,31 @@ export function HomeScreen({ navigation }: Props) {
           contentContainerStyle={styles.newsRow}
           style={styles.newsScroll}
         >
-          {news.map((item) => (
-            <Card key={item.id} style={styles.newsCard}>
-              <View style={styles.newsTag}>
-                <View style={[styles.newsIcon, { backgroundColor: item.color + '26' }]}>
-                  <Ionicons name={item.icon} size={18} color={item.color} />
+          {latestNews.slice(0, 5).map((item) => (
+            <PressableScale
+              key={item.id}
+              scaleTo={0.97}
+              onPress={() => navigation.navigate('NewsDetails', { announcementId: item.id })}
+              accessibilityLabel={item.title}
+            >
+              <Card padded={false} style={styles.newsCard}>
+                {item.image ? (
+                  <Image
+                    source={{ uri: item.image }}
+                    style={[styles.newsImage, { backgroundColor: colors.input }]}
+                    accessibilityIgnoresInvertColors
+                  />
+                ) : null}
+                <View style={styles.newsBody}>
+                  <AppText variant="caption" color="primary">
+                    {formatDate(item.date, language)}
+                  </AppText>
+                  <AppText variant="headline" numberOfLines={3}>
+                    {item.title}
+                  </AppText>
                 </View>
-                <AppText variant="caption" style={{ color: item.color }}>
-                  {item.tag[language].toUpperCase()}
-                </AppText>
-              </View>
-              <AppText variant="headline">{item.title[language]}</AppText>
-            </Card>
+              </Card>
+            </PressableScale>
           ))}
         </ScrollView>
       </FadeIn>
@@ -199,9 +265,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
@@ -291,18 +357,14 @@ const styles = StyleSheet.create({
   },
   newsCard: {
     width: 250,
-    gap: spacing.sm + 2,
+    overflow: 'hidden',
   },
-  newsTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
+  newsImage: {
+    width: '100%',
+    height: 130,
   },
-  newsIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
+  newsBody: {
+    padding: spacing.md - 4,
+    gap: spacing.xs,
   },
 });

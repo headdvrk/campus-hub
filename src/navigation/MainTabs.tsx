@@ -9,18 +9,23 @@ import { MainTabParamList } from '../types/navigation';
 import { IconName } from '../types/service';
 import { useSettings } from '../context/SettingsContext';
 import { HomeScreen } from '../screens/HomeScreen';
-import { ServicesScreen } from '../screens/ServicesScreen';
+import { NewsScreen } from '../screens/NewsScreen';
+import { JournalScreen } from '../screens/JournalScreen';
+import { ScheduleScreen } from '../screens/ScheduleScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
-import { SettingsScreen } from '../screens/SettingsScreen';
 import { tapFeedback } from '../utils/motion';
+import { spacing } from '../styles/theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+export const TAB_BAR_HEIGHT = 64;
+
 const tabIcons: Record<keyof MainTabParamList, [IconName, IconName]> = {
   Home: ['home', 'home-outline'],
-  Services: ['grid', 'grid-outline'],
+  Journal: ['school', 'school-outline'],
+  Schedule: ['calendar', 'calendar-outline'],
+  News: ['newspaper', 'newspaper-outline'],
   Profile: ['person-circle', 'person-circle-outline'],
-  Settings: ['settings', 'settings-outline'],
 };
 
 export function MainTabs() {
@@ -36,25 +41,29 @@ export function MainTabs() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         tabBarLabelStyle: styles.label,
-        // iOS-тағыдай мөлдір, артындағы мазмұнды бұлдыратып көрсететін таб-бар
+        // iOS 26 стиліндегі қалқып тұратын шыны "капсула" таб-бар
         tabBarStyle: {
           position: 'absolute',
-          height: 60 + insets.bottom,
-          paddingTop: 6,
-          paddingBottom: insets.bottom + 6,
+          marginHorizontal: spacing.md,
+          bottom: Math.max(insets.bottom, spacing.sm + 4),
+          height: TAB_BAR_HEIGHT,
+          paddingTop: 8,
+          paddingBottom: 8,
+          borderRadius: TAB_BAR_HEIGHT / 2,
+          borderTopWidth: 1,
+          borderWidth: 1,
+          borderTopColor: colors.border,
+          borderColor: colors.border,
           backgroundColor: 'transparent',
-          borderTopColor: colors.separator,
-          borderTopWidth: StyleSheet.hairlineWidth,
+          overflow: 'hidden',
           elevation: 0,
         },
         tabBarBackground: () => (
           <BlurView
             tint={colors.blurTint}
-            intensity={Platform.OS === 'android' ? 60 : 90}
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: colors.card + (Platform.OS === 'android' ? 'F2' : 'B8') },
-            ]}
+            intensity={Platform.OS === 'android' ? 60 : 80}
+            experimentalBlurMethod="dimezisBlurView"
+            style={[StyleSheet.absoluteFill, { backgroundColor: colors.bar }]}
           />
         ),
         tabBarIcon: ({ focused, color, size }) => {
@@ -66,21 +75,10 @@ export function MainTabs() {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: t('tabHome') }} />
-      <Tab.Screen
-        name="Services"
-        component={ServicesScreen}
-        options={{ title: t('tabServices') }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{ title: t('tabProfile') }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ title: t('tabSettings') }}
-      />
+      <Tab.Screen name="Journal" component={JournalScreen} options={{ title: t('tabJournal') }} />
+      <Tab.Screen name="Schedule" component={ScheduleScreen} options={{ title: t('tabSchedule') }} />
+      <Tab.Screen name="News" component={NewsScreen} options={{ title: t('news') }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: t('tabProfile') }} />
     </Tab.Navigator>
   );
 }
