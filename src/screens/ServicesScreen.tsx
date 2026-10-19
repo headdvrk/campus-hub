@@ -1,32 +1,29 @@
 import React, { useMemo, useState } from 'react';
-import { Animated, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { CompositeScreenProps } from '@react-navigation/native';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { Animated, StyleSheet, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Ionicons } from '@expo/vector-icons';
 
-import { MainTabParamList, RootStackParamList } from '../types/navigation';
+import { RootStackParamList } from '../types/navigation';
 import { Service } from '../types/service';
 import { services } from '../data/services';
 import { useSettings } from '../context/SettingsContext';
 import {
+  Backdrop,
+  BackPill,
   CompactHeader,
   EmptyState,
   FadeIn,
   LargeTitle,
+  SearchBar,
   ServiceCard,
   useScrollHeader,
 } from '../components';
-import { radius, spacing, typography } from '../styles/theme';
+import { spacing } from '../styles/theme';
 
-type Props = CompositeScreenProps<
-  BottomTabScreenProps<MainTabParamList, 'Services'>,
-  NativeStackScreenProps<RootStackParamList>
->;
+type Props = NativeStackScreenProps<RootStackParamList, 'Services'>;
 
 export function ServicesScreen({ navigation }: Props) {
-  const { colors, language, scale, t } = useSettings();
-  const header = useScrollHeader();
+  const { colors, language, t } = useSettings();
+  const header = useScrollHeader({ withBack: true });
   const [query, setQuery] = useState('');
 
   const filtered = useMemo(() => {
@@ -48,6 +45,7 @@ export function ServicesScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]}>
+      <Backdrop />
       <Animated.FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -65,26 +63,11 @@ export function ServicesScreen({ navigation }: Props) {
               subtitle={t('servicesCount', { count: services.length })}
               scrollY={header.scrollY}
             />
-            <View style={[styles.search, { backgroundColor: colors.input }]}>
-              <Ionicons name="search" size={18} color={colors.muted} />
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder={t('searchPlaceholder')}
-                placeholderTextColor={colors.muted}
-                style={[
-                  styles.searchInput,
-                  { color: colors.text, fontSize: scale(typography.body.size) },
-                ]}
-                autoCorrect={false}
-                returnKeyType="search"
-              />
-              {query ? (
-                <Pressable onPress={() => setQuery('')} hitSlop={10} accessibilityRole="button">
-                  <Ionicons name="close-circle" size={18} color={colors.muted} />
-                </Pressable>
-              ) : null}
-            </View>
+            <SearchBar
+              value={query}
+              onChangeText={setQuery}
+              placeholder={t('searchPlaceholder')}
+            />
           </View>
         }
         renderItem={({ item, index }) => (
@@ -108,6 +91,7 @@ export function ServicesScreen({ navigation }: Props) {
         }
       />
       <CompactHeader title={t('servicesTitle')} scrollY={header.scrollY} />
+      <BackPill onPress={() => navigation.goBack()} />
     </View>
   );
 }
@@ -126,17 +110,5 @@ const styles = StyleSheet.create({
   },
   column: {
     gap: spacing.md - 4,
-  },
-  search: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    borderRadius: radius.md - 2,
-    paddingHorizontal: 10,
-    minHeight: 40,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 8,
   },
 });

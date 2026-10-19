@@ -16,6 +16,10 @@ export type Service = {
   icon: IconName;
   details: LocalizedText;
   gradient: readonly [string, string];
-  hours: string;
+  // Сайтта көрсетілмесе, жол экранда шықпайды
+  hours?: string;
+  phone?: string;
   location: LocalizedText;
+  // alt.edu.kz сайтындағы бет
+  link: string;
 };

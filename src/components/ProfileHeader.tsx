@@ -2,26 +2,30 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Student } from '../types/student';
+import { StudentProfile } from '../types/profile';
 import { useSettings } from '../context/SettingsContext';
 import { radius, spacing } from '../styles/theme';
 import { AppText } from './AppText';
 
-type Props = { student: Student };
+type Props = { profile: StudentProfile };
+
+export function initials(profile: StudentProfile): string {
+  return (profile.firstName.charAt(0) + profile.lastName.charAt(0)).toUpperCase();
+}
 
 // Градиентті сақинасы бар аватар, аты-жөні және тобы
-export function ProfileHeader({ student }: Props) {
+export function ProfileHeader({ profile }: Props) {
   const { colors } = useSettings();
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={colors.hero}
+        colors={[colors.accent, colors.hero[0]]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.ring}
       >
-        <View style={[styles.avatarInner, { backgroundColor: colors.background }]}>
+        <View style={[styles.avatarInner, { backgroundColor: colors.elevated }]}>
           <LinearGradient
             colors={colors.hero}
             start={{ x: 0, y: 0 }}
@@ -29,17 +33,17 @@ export function ProfileHeader({ student }: Props) {
             style={styles.avatar}
           >
             <AppText variant="title1" color="onPrimary">
-              {student.initials}
+              {initials(profile)}
             </AppText>
           </LinearGradient>
         </View>
       </LinearGradient>
       <AppText variant="title2" center>
-        {student.name}
+        {profile.firstName} {profile.lastName}
       </AppText>
       <View style={[styles.chip, { backgroundColor: colors.iconBackground }]}>
         <AppText variant="footnote" color="primary" style={styles.chipText}>
-          {student.group}
+          {profile.group}
         </AppText>
       </View>
     </View>

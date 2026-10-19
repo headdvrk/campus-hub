@@ -10,7 +10,7 @@ type Props = {
   padded?: boolean;
 };
 
-// Жұмсақ көлеңкесі бар дөңгелек бұрышты карточка
+// "Liquid Glass" карточкасы: фон көрініп тұратын мөлдір бет және жарық жиек
 export function Card({ children, style, padded = true }: Props) {
   const { colors } = useSettings();
 
@@ -19,7 +19,7 @@ export function Card({ children, style, padded = true }: Props) {
       style={[
         styles.card,
         padded && styles.padded,
-        { backgroundColor: colors.card, shadowColor: colors.shadow },
+        { backgroundColor: colors.card, borderColor: colors.border, shadowColor: colors.shadow },
         style,
       ]}
     >
@@ -30,11 +30,13 @@ export function Card({ children, style, padded = true }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: radius.lg,
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
-    shadowRadius: 16,
-    elevation: 2,
+    shadowRadius: 24,
+    // Android-та elevation мөлдір беттің ішінен сұр дақ болып көрінеді
+    elevation: 0,
   },
   padded: {
     padding: spacing.md,

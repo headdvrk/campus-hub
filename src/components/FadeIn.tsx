@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
 
-import { useNativeDriver } from '../utils/motion';
+import { reduceMotion, useNativeDriver } from '../utils/motion';
 
 type Props = {
   children: ReactNode;
@@ -16,6 +16,10 @@ export function FadeIn({ children, delay = 0, offset = 14, style }: Props) {
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (reduceMotion) {
+      progress.setValue(1);
+      return;
+    }
     Animated.timing(progress, {
       toValue: 1,
       duration: 420,

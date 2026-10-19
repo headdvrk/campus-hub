@@ -1,5 +1,6 @@
 import React, { ReactNode, useContext, useRef } from 'react';
-import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Animated, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
@@ -8,9 +9,11 @@ import { useSettings } from '../context/SettingsContext';
 import { spacing } from '../styles/theme';
 import { useNativeDriver } from '../utils/motion';
 import { AppText } from './AppText';
+import { Backdrop } from './Backdrop';
 
 // Үлкен тақырып пен айналдыру күйі: ScrollView де, FlatList те қолдана алады
-export function useScrollHeader() {
+// withBack: экранның үстінде «артқа» батырмасы тұрады, мазмұн сонша төмен түседі
+export function useScrollHeader({ withBack = false } = {}) {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useContext(BottomTabBarHeightContext) ?? 0;
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -24,10 +27,40 @@ export function useScrollHeader() {
     scrollY,
     onScroll,
     contentStyle: {
-      paddingTop: insets.top + spacing.sm,
-      paddingBottom: Math.max(tabBarHeight, insets.bottom) + spacing.lg,
+      paddingTop: insets.top + spacing.sm + (withBack ? BACK_PILL_SPACE : 0),
+      // Таб-бар төменгі шеттен көтеріліп қалқып тұрады, мазмұн оның астында қалмауы керек
+      paddingBottom:
+        (tabBarHeight ? tabBarHeight + Math.max(insets.bottom, spacing.sm + 4) : insets.bottom) +
+        spacing.lg,
     },
   };
+}
+
+const BACK_PILL_SPACE = 44;
+
+// Стек экрандарындағы қалқып тұратын шыны «артқа» батырмасы
+export function BackPill({ onPress }: { onPress: () => void }) {
+  const { colors, t } = useSettings();
+  const insets = useSafeAreaInsets();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityLabel={t('back')}
+      style={({ pressed }) => [
+        styles.backPill,
+        { top: insets.top + 6, borderColor: colors.border, opacity: pressed ? 0.7 : 1 },
+      ]}
+    >
+      <BlurView tint={colors.blurTint} intensity={60} style={[StyleSheet.absoluteFill, { backgroundColor: colors.bar }]} />
+      <Ionicons name="chevron-back" size={20} color={colors.primary} />
+      <AppText variant="subhead" color="primary" style={styles.backText}>
+        {t('back')}
+      </AppText>
+    </Pressable>
+  );
 }
 
 type LargeTitleProps = {
@@ -84,7 +117,7 @@ export function CompactHeader({
       <BlurView
         tint={colors.blurTint}
         intensity={90}
-        style={[StyleSheet.absoluteFill, { backgroundColor: colors.background + 'B3' }]}
+        style={[StyleSheet.absoluteFill, { backgroundColor: colors.bar }]}
       />
       <View style={[styles.compactInner, { paddingTop: insets.top }]}>
         <AppText variant="headline" numberOfLines={1}>
@@ -102,15 +135,17 @@ type ScreenProps = {
   right?: ReactNode;
   children: ReactNode;
   contentStyle?: StyleProp<ViewStyle>;
+  onBack?: () => void;
 };
 
 // Үлкен тақырыбы бар, айналдырылатын стандарт экран
-export function Screen({ title, subtitle, right, children, contentStyle }: ScreenProps) {
+export function Screen({ title, subtitle, right, children, contentStyle, onBack }: ScreenProps) {
   const { colors } = useSettings();
-  const header = useScrollHeader();
+  const header = useScrollHeader({ withBack: Boolean(onBack) });
 
   return (
     <View style={[styles.flex, { backgroundColor: colors.background }]}>
+      <Backdrop />
       <Animated.ScrollView
         onScroll={header.onScroll}
         scrollEventThrottle={16}
@@ -126,6 +161,7 @@ export function Screen({ title, subtitle, right, children, contentStyle }: Scree
         {children}
       </Animated.ScrollView>
       <CompactHeader title={title} scrollY={header.scrollY} />
+      {onBack ? <BackPill onPress={onBack} /> : null}
     </View>
   );
 }
@@ -165,6 +201,23 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  backPill: {
+    position: 'absolute',
+    left: spacing.md,
+    zIndex: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    minHeight: 36,
+    paddingLeft: 8,
+    paddingRight: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  backText: {
+    fontWeight: '600',
   },
   hairline: {
     position: 'absolute',

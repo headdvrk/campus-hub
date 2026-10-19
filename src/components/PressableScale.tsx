@@ -1,6 +1,7 @@
 import React, { ReactNode, useRef } from 'react';
 import {
   AccessibilityRole,
+  AccessibilityState,
   Animated,
   Pressable,
   StyleProp,
@@ -20,7 +21,7 @@ type Props = {
   disabled?: boolean;
   accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
-  accessibilityState?: { selected?: boolean; checked?: boolean };
+  accessibilityState?: AccessibilityState;
 };
 
 // Басқанда серіппе (spring) анимациясымен сәл кішірейетін батырма
@@ -58,7 +59,7 @@ export function PressableScale({
       style={containerStyle}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={accessibilityState}
+      accessibilityState={{ disabled, ...accessibilityState }}
     >
       <Animated.View style={[style, { transform: [{ scale }] }]}>
         {children}

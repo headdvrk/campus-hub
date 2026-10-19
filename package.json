@@ -29,7 +29,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "server": "node --use-system-ca server/index.js",
+    "test:server": "node server/tests/api.test.js && node server/tests/smtp.test.js"
   },
   "private": true
 }

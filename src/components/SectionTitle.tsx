@@ -23,7 +23,13 @@ export function SectionTitle({ title, subtitle, actionLabel, onAction }: Props) 
         ) : null}
       </View>
       {actionLabel && onAction ? (
-        <Pressable onPress={onAction} accessibilityRole="button" hitSlop={8}>
+        <Pressable
+          onPress={onAction}
+          accessibilityRole="button"
+          accessibilityLabel={`${actionLabel}: ${title}`}
+          hitSlop={12}
+          style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
+        >
           <AppText variant="callout" color="primary">
             {actionLabel}
           </AppText>
