@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, StyleSheet, View } from 'react-native';
-import { CompositeScreenProps } from '@react-navigation/native';
+import { ActivityIndicator, Animated, StyleSheet, View, Button, Text } from 'react-native';import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +21,8 @@ import {
   useScrollHeader,
 } from '../components';
 import { spacing } from '../styles/theme';
+import { savePost } from '../database/favorites';
+import { getAnnouncement } from '../api/announcements';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'News'>,
@@ -29,6 +30,45 @@ type Props = CompositeScreenProps<
 >;
 
 export function NewsScreen({ navigation }: Props) {
+  const [savingId, setSavingId] = useState<number | null>(null);
+const [saveMessage, setSaveMessage] = useState('');
+const saveLock = useRef(false);
+
+async function handleSave(item: Announcement) {
+  if (saveLock.current) return;
+
+  saveLock.current = true;
+  setSavingId(item.id);
+  setSaveMessage('');
+
+  try {
+    const fullPost = await getAnnouncement(item.id);
+
+    if (!fullPost.body?.trim()) {
+      throw new Error('Жаңалықтың толық мәтіні жүктелмеді.');
+    }
+
+    const added = await savePost({
+      id: fullPost.id,
+      title: fullPost.title,
+      body: fullPost.body,
+    });
+
+    setSaveMessage(
+      added > 0
+        ? 'Жаңалық таңдаулыларға сақталды!'
+        : 'Бұл жаңалық бұрын сақталған.'
+    );
+  } catch (error) {
+    setSaveMessage(
+      'Сақтау қатесі: ' +
+        (error instanceof Error ? error.message : String(error))
+    );
+  } finally {
+    saveLock.current = false;
+    setSavingId(null);
+  }
+}
   const { colors, language, t } = useSettings();
   const header = useScrollHeader();
 
@@ -157,11 +197,32 @@ export function NewsScreen({ navigation }: Props) {
             ) : null}
           </View>
         }
-        renderItem={({ item, index }) => (
-          <FadeIn delay={60 + index * 40}>
-            <AnnouncementCard item={item} onPress={openAnnouncement} />
-          </FadeIn>
-        )}
+renderItem={({ item, index }) => (
+  <FadeIn delay={60 + index * 40}>
+    <AnnouncementCard item={item} onPress={openAnnouncement} />
+
+    <View style={{ marginTop: 8, marginBottom: 16 }}>
+      <Button
+        title={
+          savingId === item.id
+            ? 'Сақталуда...'
+            : 'Таңдаулыларға сақтау'
+        }
+        disabled={savingId !== null}
+        onPress={() => {
+          void handleSave(item);
+        }}
+      />
+    </View>
+  </FadeIn>
+)}
+ListFooterComponent={
+  saveMessage ? (
+    <Text style={{ color: colors.text, padding: 16 }}>
+      {saveMessage}
+    </Text>
+  ) : null
+}
         ListEmptyComponent={
           query ? (
             <EmptyState

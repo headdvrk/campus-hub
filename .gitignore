@@ -43,3 +43,5 @@ yarn-error.*
 # auth server
 server/.env
 server/data/
+
+/server/data/

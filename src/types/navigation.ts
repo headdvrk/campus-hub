@@ -10,6 +10,8 @@ export type MainTabParamList = {
 };
 
 export type RootStackParamList = {
+    EventRegistration: undefined;
+    Favorites: undefined;
   // Кірмеген пайдаланушы экрандары
   Login: undefined;
   Register: undefined;

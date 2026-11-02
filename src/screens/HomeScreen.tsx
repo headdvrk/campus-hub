@@ -1,3 +1,4 @@
+import { PrimaryButton } from '../components/PrimaryButton';    
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { CompositeScreenProps } from '@react-navigation/native';
@@ -86,6 +87,15 @@ export function HomeScreen({ navigation }: Props) {
       subtitle={formatToday(language)}
       right={avatar}
     >
+      <PrimaryButton
+        title="Іс-шараға тіркелу"
+        onPress={() => navigation.navigate('EventRegistration')}
+      />
+      <PrimaryButton
+  title="Таңдаулылар"
+  onPress={() => navigation.navigate('Favorites')}
+/>
+
       <FadeIn delay={50}>
         <PressableScale
           scaleTo={0.98}

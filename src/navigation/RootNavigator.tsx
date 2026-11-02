@@ -1,3 +1,4 @@
+import { EventRegistrationScreen } from '../screens/EventRegistrationScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -15,6 +16,8 @@ import { SubjectScreen } from '../screens/SubjectScreen';
 import { TranscriptScreen } from '../screens/TranscriptScreen';
 import { NewsDetailsScreen } from '../screens/NewsDetailsScreen';
 import { NotFoundScreen } from '../screens/NotFoundScreen';
+import { FavoritesScreen } from '../screens/FavoritesScreen';
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -29,10 +32,24 @@ export function RootNavigator() {
       {profile ? (
         <>
           <Stack.Screen
-            name="Main"
-            component={MainTabs}
-            options={{ headerShown: false, animation: 'fade' }}
-          />
+  name="Main"
+  component={MainTabs}
+  options={{ headerShown: false, animation: 'fade' }}
+/>
+
+<Stack.Screen
+  name="EventRegistration"
+  component={EventRegistrationScreen}
+  options={{
+    title: 'Іс-шараға тіркелу',
+    headerBackTitle: 'Артқа',
+  }}
+/>
+<Stack.Screen
+  name="Favorites"
+  component={FavoritesScreen}
+  options={{ title: 'Таңдаулылар' }}
+/>  
           {/* Өз үлкен тақырыбы мен шыны «артқа» батырмасы бар экрандар */}
           <Stack.Group screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Services" component={ServicesScreen} />
