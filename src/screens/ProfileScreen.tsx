@@ -10,6 +10,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useAuth, useProfile } from '../context/AuthContext';
 import { overallGpa } from './JournalScreen';
 import { languageNames } from '../i18n/translations';
+import { ProfilePhoto } from '../components/ProfilePhoto';
 import {
   AppText,
   FadeIn,
@@ -38,6 +39,7 @@ export function ProfileScreen({ navigation }: Props) {
 
   return (
     <Screen title={t('tabProfile')}>
+      <ProfilePhoto key={profile.email} userId={profile.email} />
       <FadeIn>
         <ProfileHeader profile={profile} />
       </FadeIn>

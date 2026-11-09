@@ -13,9 +13,10 @@ type Props = {
   variant?: 'primary' | 'tinted' | 'danger' | 'accent';
   // Сұраныс жүріп жатқанда: индикатор көрсетіледі, қайта басу мүмкін емес
   loading?: boolean;
+  disabled?: boolean;
 };
 
-export function PrimaryButton({ title, onPress, variant = 'primary', loading = false }: Props) {
+export function PrimaryButton({ title, onPress, variant = 'primary', loading = false, disabled = false }: Props) {
   const { colors } = useSettings();
   const a11y = { accessibilityLabel: title, accessibilityState: { busy: loading } };
 
@@ -25,7 +26,8 @@ export function PrimaryButton({ title, onPress, variant = 'primary', loading = f
     return (
       <PressableScale
         onPress={onPress}
-        disabled={loading}
+        disabled={loading || disabled}
+        containerStyle={{ opacity: disabled ? 0.55 : 1 }}
         style={[styles.shadow, { shadowColor: isAccent ? colors.accent : colors.hero[0] }]}
         {...a11y}
       >
@@ -50,7 +52,7 @@ export function PrimaryButton({ title, onPress, variant = 'primary', loading = f
   const tint = variant === 'danger' ? colors.danger : colors.primary;
 
   return (
-    <PressableScale onPress={onPress} disabled={loading} {...a11y}>
+    <PressableScale onPress={onPress} disabled={loading || disabled} containerStyle={{ opacity: disabled ? 0.55 : 1 }} {...a11y}>
       <View style={[styles.button, { backgroundColor: colors.card, borderColor: colors.border }, styles.bordered]}>
         {loading ? (
           <ActivityIndicator color={tint} />

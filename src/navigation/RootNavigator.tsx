@@ -48,7 +48,7 @@ export function RootNavigator() {
 <Stack.Screen
   name="Favorites"
   component={FavoritesScreen}
-  options={{ title: 'Таңдаулылар' }}
+  options={{ title: t('favorites'), headerShown: false }}
 />  
           {/* Өз үлкен тақырыбы мен шыны «артқа» батырмасы бар экрандар */}
           <Stack.Group screenOptions={{ headerShown: false }}>
@@ -69,7 +69,7 @@ export function RootNavigator() {
           <Stack.Screen
             name="NewsDetails"
             component={NewsDetailsScreen}
-            options={{ title: t('newsDetailsTitle'), headerBackTitle: t('back') }}
+            options={{ title: t('newsDetailsTitle'), headerShown: false }}
           />
         </>
       ) : (

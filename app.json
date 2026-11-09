@@ -22,7 +22,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Профильге фото таңдау үшін фотосуреттерге рұқсат беріңіз.",
+          "cameraPermission": "Профиль фотосын түсіру үшін камераға рұқсат беріңіз.",
+          "microphonePermission": false
+        }
+      ]
     ]
   }
 }

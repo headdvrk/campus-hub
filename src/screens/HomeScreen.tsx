@@ -92,7 +92,8 @@ export function HomeScreen({ navigation }: Props) {
         onPress={() => navigation.navigate('EventRegistration')}
       />
       <PrimaryButton
-  title="Таңдаулылар"
+  title={t('favorites')}
+  variant="tinted"
   onPress={() => navigation.navigate('Favorites')}
 />
 
